@@ -1,6 +1,6 @@
 
 
-var playerAnimation = new Array();
+
 
 // Game objects:
 function Player(node){
@@ -15,24 +15,15 @@ function Player(node){
 ************** Main ******************
 */
 $(function(){
-	
-	playerAnimation["idle"] = new $.gQ.Animation({imageURL: "CatGunIdle.png", numberOfFrame:8, delta:64, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
-	
+
 	GameEnvironment.initializePlayground();
 	
-	GameEnvironment.initializeBackground();
+	GameEnvironment.initializeGraphics();
 	
-
-			
+	GameEnvironment.initializeStartButton();
+	
 	$("#player")[0].player = new Player($("#player"));
-			
-	//initialize the start button
-	$("#startbutton").click(function(){
-		$.playground().startGame(function(){
-			$("#welcomeScreen").fadeTo(1000,0,function(){$(this).remove();});
-		});
-	})
-	
+
 		// this is the function that control most of the game logic 
 	$.playground().registerCallback(function(){
 			//Update the movement of the ship:
