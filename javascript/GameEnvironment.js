@@ -2,25 +2,18 @@
 // 			GameEnvironment
 // *********************************************
 // Contains settings and initialization methods
-// for the general game environment including
-// background, player, and character images and
-// animations.
+// for the general game environment.
+
 var GameEnvironment = function() {
 
 	// Constants
 	var PLAYGROUND_WIDTH	= 700;
 	var PLAYGROUND_HEIGHT	= 500;
-	var REFRESH_RATE        = 15;
-	var PLAYER_HEIGHT       = 32;
-	var PLAYER_WIDTH        = 60;
-
+	var REFRESH_RATE        = 30;
+	
 	// Background animations
 	var background1 = new $.gQ.Animation({imageURL: "background1.png"});
 	var background2 = new $.gQ.Animation({imageURL: "background1.png"});
-	
-	// Player animations
-	var playerAnimation = new Array();
-	playerAnimation["idle"] = new $.gQ.Animation({imageURL: "CatGunIdle.png", numberOfFrame:8, delta:64, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
 	
 	// Methods
 	var getPlaygroundHeight = function() {
@@ -45,8 +38,9 @@ var GameEnvironment = function() {
 				.addSprite("background2", {animation: background2, width: PLAYGROUND_WIDTH, height: PLAYGROUND_HEIGHT, posx: PLAYGROUND_WIDTH})
 				.end()
 			.addGroup("actors", {width: PLAYGROUND_WIDTH, height: PLAYGROUND_HEIGHT})
-			.addGroup("player", {posx: PLAYGROUND_WIDTH/2, posy: PLAYGROUND_HEIGHT/2, width: PLAYER_WIDTH, height: PLAYER_HEIGHT})
-				.addSprite("playerIdle",{animation: playerAnimation["idle"], posx: 0, posy: 0, width: PLAYER_WIDTH, height: PLAYER_HEIGHT});
+			.addGroup("player", {posx: PLAYGROUND_WIDTH/2, posy: PLAYGROUND_HEIGHT/2, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
+				.addSprite("playerIdle",{animation: Player.getIdleAnimation(), posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
+				.addSprite("playerWalkRight", {posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()});
 	};
 	
 	var initializeStartButton = function() {
@@ -58,7 +52,7 @@ var GameEnvironment = function() {
 	};
 	
 	return {
-		// Object literal containing publicly exposed methods
+		// Public methods
 		initializePlayground: initializePlayground,
 		initializeGraphics: initializeGraphics,
 		initializeStartButton: initializeStartButton,
