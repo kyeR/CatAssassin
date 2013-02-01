@@ -12,8 +12,8 @@ var GameEnvironment = function() {
 	var REFRESH_RATE        = 30;
 	
 	// Background animations
-	var background1 = new $.gQ.Animation({imageURL: "background1.png"});
-	var background2 = new $.gQ.Animation({imageURL: "background1.png"});
+	var background1 = new $.gQ.Animation({imageURL: "images/background1.png"});
+	var background2 = new $.gQ.Animation({imageURL: "images/background1.png"});
 	
 	// Methods
 	var getPlaygroundHeight = function() {
@@ -39,8 +39,8 @@ var GameEnvironment = function() {
 				.end()
 			.addGroup("actors", {width: PLAYGROUND_WIDTH, height: PLAYGROUND_HEIGHT})
 			.addGroup("player", {posx: PLAYGROUND_WIDTH/2, posy: PLAYGROUND_HEIGHT/2, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
-				.addSprite("playerIdle",{animation: Player.getIdleAnimation(), posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
-				.addSprite("playerWalkRight", {posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()});
+				.addSprite(SpriteNames.playerIdle,{animation: Player.getIdleAnimation(), posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
+				.addSprite(SpriteNames.playerWalkRight, {posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()});
 	};
 	
 	var initializeStartButton = function() {

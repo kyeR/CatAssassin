@@ -1,17 +1,17 @@
 // *********************************************
-// 			        Player
+//                  Player
 // *********************************************
-// Contains settings and animations for the player
-// character.
 
 var Player = function () {
 
 	var PLAYER_HEIGHT       = 48;
 	var PLAYER_WIDTH        = 75;
 	
-		// Player animations
-	var idleAnimation = new $.gQ.Animation({imageURL: "CatGunIdle.png", numberOfFrame:8, delta:97, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
-	var walkRightAnimation = new $.gQ.Animation({imageURL: "CatGunWalkRight.png", numberOfFrame:8, delta:96, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
+	var isFacingRight = false;
+	
+	// Player animations
+	var idleAnimation = new $.gQ.Animation({imageURL: "images/CatGunIdle.png", numberOfFrame:8, delta:97, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
+	var walkRightAnimation = new $.gQ.Animation({imageURL: "images/CatGunWalkRight.png", numberOfFrame:8, delta:96, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
 	
 	var getPlayerHeight = function() {
 		return PLAYER_HEIGHT;
@@ -25,9 +25,43 @@ var Player = function () {
 		return idleAnimation;
 	};
 	
-	var getWalkingRightAnimation = function(){
-		return walkRightAnimation;
+	var animateIdle = function() {
+		$("#" + SpriteNames.playerWalkRight).setAnimation();
+		$("#" + SpriteNames.playerIdle).setAnimation(Player.getIdleAnimation());
 	}
+	
+	var moveRight = function() {
+		var nextpos = $("#player").x()+5;
+		if(nextpos < GameEnvironment.getPlaygroundWidth() - 30){
+			$("#player").x(nextpos);
+		};
+	};
+	
+	var animateWalkingRight = function() {
+		$("#" + SpriteNames.playerIdle).setAnimation();
+		$("#" + SpriteNames.playerWalkRight).setAnimation(walkRightAnimation);
+	}
+	
+	var moveUp = function() {
+		var nextpos = $("#player").y()-3;
+		if(nextpos > 0){
+			$("#player").y(nextpos);
+		};
+	};
+	
+	var moveLeft = function() {
+		var nextpos = $("#player").x()-5;
+		if(nextpos > 0){
+			$("#player").x(nextpos);
+		};
+	};
+	
+	var moveDown = function() {
+		var nextpos = $("#player").y()+3;
+		if(nextpos < GameEnvironment.getPlaygroundHeight() - 30){
+			$("#player").y(nextpos);
+		};
+	};
 	
 	
 	return {
@@ -35,6 +69,11 @@ var Player = function () {
 		getPlayerHeight: getPlayerHeight,
 		getPlayerWidth: getPlayerWidth,
 		getIdleAnimation: getIdleAnimation,
-		getWalkingRightAnimation: getWalkingRightAnimation
+		animateIdle: animateIdle,
+		animateWalkingRight: animateWalkingRight,
+		moveRight: moveRight,
+		moveUp: moveUp,
+		moveLeft: moveLeft,
+		moveDown: moveDown
 		};
 }();
