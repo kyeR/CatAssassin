@@ -12,6 +12,7 @@ var Player = function () {
 	// Player animations
 	var idleAnimation = new $.gQ.Animation({imageURL: "images/CatGunIdle.png", numberOfFrame:8, delta:97, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
 	var walkRightAnimation = new $.gQ.Animation({imageURL: "images/CatGunWalkRight.png", numberOfFrame:8, delta:96, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
+	var walkLeftAnimation = new $.gQ.Animation({imageURL: "images/CatGunWalkLeft.png", numberOfFrame:8, delta:96, rate:100, type:$.gQ.ANIMATION_HORIZONTAL});
 	
 	var getPlayerHeight = function() {
 		return PLAYER_HEIGHT;
@@ -27,6 +28,7 @@ var Player = function () {
 	
 	var animateIdle = function() {
 		$("#" + SpriteNames.playerWalkRight).setAnimation();
+		$("#" + SpriteNames.playerWalkLeft).setAnimation();
 		$("#" + SpriteNames.playerIdle).setAnimation(Player.getIdleAnimation());
 	}
 	
@@ -39,7 +41,14 @@ var Player = function () {
 	
 	var animateWalkingRight = function() {
 		$("#" + SpriteNames.playerIdle).setAnimation();
+		$("#" + SpriteNames.playerWalkLeft).setAnimation();
 		$("#" + SpriteNames.playerWalkRight).setAnimation(walkRightAnimation);
+	}
+	
+	var animateWalkingLeft = function() {
+		$("#" + SpriteNames.playerIdle).setAnimation();
+		$("#" + SpriteNames.playerWalkRight).setAnimation();
+		$("#" + SpriteNames.playerWalkLeft).setAnimation(walkLeftAnimation);
 	}
 	
 	var moveUp = function() {
@@ -71,6 +80,7 @@ var Player = function () {
 		getIdleAnimation: getIdleAnimation,
 		animateIdle: animateIdle,
 		animateWalkingRight: animateWalkingRight,
+		animateWalkingLeft: animateWalkingLeft,
 		moveRight: moveRight,
 		moveUp: moveUp,
 		moveLeft: moveLeft,

@@ -44,6 +44,10 @@ $(function(){
 				// $("#"+name).addClass("playerMissiles")
 				// break;
 			case 65: //this is left! (a)
+				if (keyHeldDown)
+					return;
+				keyHeldDown = true;
+				Player.animateWalkingLeft();
 				break;
 			case 87: //this is up! (w)
 				break;
@@ -61,6 +65,8 @@ $(function(){
 	$(document).keyup(function(e){
 		switch(e.keyCode){
 			case 65: //this is left! (a)
+				keyHeldDown = false;
+				Player.animateIdle();
 				break;
 			case 87: //this is up! (w)
 				break;

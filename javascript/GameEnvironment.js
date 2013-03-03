@@ -40,7 +40,8 @@ var GameEnvironment = function() {
 			.addGroup("actors", {width: PLAYGROUND_WIDTH, height: PLAYGROUND_HEIGHT})
 			.addGroup("player", {posx: PLAYGROUND_WIDTH/2, posy: PLAYGROUND_HEIGHT/2, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
 				.addSprite(SpriteNames.playerIdle,{animation: Player.getIdleAnimation(), posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
-				.addSprite(SpriteNames.playerWalkRight, {posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()});
+				.addSprite(SpriteNames.playerWalkRight, {posx: 0, posy: 0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()})
+				.addSprite(SpriteNames.playerWalkLeft, {posx: 0, posy:0, width: Player.getPlayerWidth(), height: Player.getPlayerHeight()});
 	};
 	
 	var initializeStartButton = function() {
