@@ -19,21 +19,21 @@ var GameEnvironment = function() {
 	var PLAYER_WIDTH       = 75;
 	var playerAnimations = {
 		idle: new $.gQ.Animation({
-			imageURL: "images/CatGunIdle.png", 
+			imageURL: "/images/CatGunIdle.png", 
 			numberOfFrame:8, 
 			delta:97, 
 			rate:100, 
 			type:$.gQ.ANIMATION_HORIZONTAL
 		}),
 		walkRight: new $.gQ.Animation({
-			imageURL: "images/CatGunWalkRight.png", 
+			imageURL: "/images/CatGunWalkRight.png", 
 			numberOfFrame:8, 
 			delta:96, 
 			rate:100, 
 			type:$.gQ.ANIMATION_HORIZONTAL
 		}),
 		walkLeft: new $.gQ.Animation({
-			imageURL: "images/CatGunWalkLeft.png", 
+			imageURL: "/images/CatGunWalkLeft.png", 
 			numberOfFrame:8, 
 			delta:96, 
 			rate:100, 
