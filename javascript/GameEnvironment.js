@@ -159,11 +159,24 @@ var Playground = function(){
 			height: Player.getHeight()
 		};
 
-		playground.addGroup("player", groupSettings)
+		playground = playground.addGroup("player", groupSettings)
 			.addSprite(Player.getIdleSprite(), idleSettings)
 			.addSprite(Player.getWalkRightSprite, walkRightSettings)
-			.addSprite(Player.getWalkLeftSprite, walkLeftSettings);
+			.addSprite(Player.getWalkLeftSprite, walkLeftSettings).end();
+
+		if (actorGroupSetup) {
+			playground = playground.end();
+		}
+
+		playground.addGroup("playerBulletLayer",
+			{
+				width: playgroundWidth,
+				height: playgroundHeight
+			}).end();
+
 	}
+
+
 
 	var scrollScenery = function() {
 		var bg1 = "#" + BACKGROUND_SPRITE_1;
@@ -236,7 +249,6 @@ var Player = function () {
 	var walkLeftAnimation;
 
 	var idle = false;
-	var isMovingRight = false;
 
 	var init = function(height, width, animations) {
 		playerHeight = height;
@@ -275,7 +287,6 @@ var Player = function () {
 		$("#" + WALK_LEFT_SPRITE).setAnimation();
 		$("#" + IDLE_SPRITE).setAnimation(idleAnimation);
 		idle = true;
-		isMovingRight = false;
 	}
 	
 	var animateWalkingRight = function() {
@@ -296,7 +307,6 @@ var Player = function () {
 		var nextpos = $(PLAYER_ID).y()-2;
 		if(nextpos > 0 && nextpos >= Playground.topOfMoveableArea()){
 			$(PLAYER_ID).y(nextpos);
-			isMovingRight = false;
 		};
 	};
 	
@@ -304,7 +314,6 @@ var Player = function () {
 		var nextpos = $(PLAYER_ID).x()-4;
 		if(nextpos > 0){
 			$(PLAYER_ID).x(nextpos);
-			isMovingRight = false;
 		};
 	};
 	
@@ -312,14 +321,12 @@ var Player = function () {
 		var nextpos = $(PLAYER_ID).y()+2;
 		if(nextpos < GameEnvironment.getHeight() - 30){
 			$(PLAYER_ID).y(nextpos);
-			isMovingRight = false;
 		};
 	};
 
 	var moveRight = function() {
 		var nextpos = $(PLAYER_ID).x() + getForwardSpeed();
 		if(nextpos < GameEnvironment.getWidth() - 30){
-			isMovingRight = true;
 			$(PLAYER_ID).x(nextpos);
 		};
 	};
@@ -330,7 +337,7 @@ var Player = function () {
 
 	var isAdvancing = function() {
 		return ($(PLAYER_ID).x() > Playground.scrollingPoint())
-			&& !isIdle() && isMovingRight;
+			&& !isIdle();
 	};
 
 	var getForwardSpeed = function() {
@@ -348,6 +355,30 @@ var Player = function () {
 
 	var yPosition = function(){
 		return $("#player").y();
+	};
+
+	var shootBullet = function(){
+		var bulletAnimation = new $.gQ.Animation(
+			{
+				imageURL:"images/bullet.png",
+				numberOfFrame: 1,
+				delta: 0,
+				rate: 0,
+				type: $.gQ.ANIMATION_VERTICAL
+			});
+
+		var name = "playerBullet_"+Math.ceil(Math.random()*1000);
+
+		$("#playerBulletLayer").addSprite(name,
+			{
+				animation: bulletAnimation,
+				posx: xPosition() + 70,
+				posy: yPosition() + 18,
+				width: 20,
+				height: 20
+			});
+
+		$("#"+name).addClass("playerBullets");
 	};
 	
 	return {
@@ -370,6 +401,7 @@ var Player = function () {
 		isAdvancing: isAdvancing,
 		xPosition: xPosition,
 		yPosition: yPosition,
-		setStartingPosition: setStartingPosition
+		setStartingPosition: setStartingPosition,
+		shootBullet: shootBullet
 	};
 }();

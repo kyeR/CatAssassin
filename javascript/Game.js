@@ -6,12 +6,49 @@
 $(function(){
 
 	GameEnvironment.initGame();
-	KeyBindings.registerPlayerMovementAnimations();
+	KeyBindings.registerPlayerActionAnimations();
 	Player.setStartingPosition();
+
+	var BULLET_SPEED = 10;
 	
 	// Main game loop
 	$.playground().registerCallback(function(){
 		KeyBindings.handlePlayerMovement();
+
+		//Update the movement of the missiles
+		$(".playerBullets").each(function(){
+				var posx = $(this).x();
+				if(posx > GameEnvironment.getWidth()){
+					$(this).remove();
+					return;
+				}
+				$(this).x(BULLET_SPEED, true);
+				// //Test for collisions
+				// var collided = $(this).collision(".enemy,."+$.gQ.groupCssClass);
+				// if(collided.length > 0){
+				// 	//An enemy has been hit!
+				// 	collided.each(function(){
+				// 			if($(this)[0].enemy.damage()){
+				// 				if(this.enemy instanceof Bossy){
+				// 						$(this).setAnimation(enemies[2]["explode"], function(node){$(node).remove();});
+				// 						$(this).css("width", 150);
+				// 				} else if(this.enemy instanceof Brainy) {
+				// 					$(this).setAnimation(enemies[1]["explode"], function(node){$(node).remove();});
+				// 					$(this).css("width", 150);
+				// 				} else {
+				// 					$(this).setAnimation(enemies[0]["explode"], function(node){$(node).remove();});
+				// 					$(this).css("width", 200);
+				// 				}
+				// 				$(this).removeClass("enemy");
+				// 			}
+				// 		})
+				// 	$(this).setAnimation(missile["playerexplode"], function(node){$(node).remove();});
+				// 	$(this).css("width", 38);
+				// 	$(this).css("height", 23);
+				// 	$(this).y(-7, true);
+				// 	$(this).removeClass("playerMissiles");
+				// }
+			});
 	}, GameEnvironment.getRefreshRate());
 });
 
@@ -21,11 +58,14 @@ var KeyBindings = function(){
 	var DOWN_KEY = 83;
 	var LEFT_KEY = 65;
 	var RIGHT_KEY = 68;
+	var SHOOT_KEY = 75;
 
 	var downPressed = false;
 	var upPressed = false;
 	var leftPressed = false;
 	var rightPressed = false;
+	var shootPressed = false;
+	var rapidFire;
 
 	var keyPressed = function(){
 		return downPressed || upPressed || leftPressed || rightPressed;
@@ -55,7 +95,7 @@ var KeyBindings = function(){
 		}
 	};
 
-	var registerPlayerMovementAnimations = function() {
+	var registerPlayerActionAnimations = function() {
 		// Player movement animations
 		$(document).keydown(function(e){
 			switch(e.keyCode){
@@ -83,6 +123,15 @@ var KeyBindings = function(){
 					downPressed = true;
 					Player.animateWalkingRight();
 					break;
+				case SHOOT_KEY: //this is shoot (k)
+					if (shootPressed) {
+						rapidFire = setTimeout(Player.shootBullet(), 100);
+					}
+					else {
+						Player.shootBullet();
+						shootPressed = true;
+					}
+					break;
 				}
 		});
 		$(document).keyup(function(e){
@@ -99,13 +148,17 @@ var KeyBindings = function(){
 				case DOWN_KEY: //this is down! (s)
 					downPressed = false;
 					break;
+				case SHOOT_KEY:
+					clearTimeout(rapidFire);
+					shootPressed = false;
+					break;
 			}
 		});
 	};
 
 	return {
 		handlePlayerMovement: handlePlayerMovement,
-		registerPlayerMovementAnimations: registerPlayerMovementAnimations
+		registerPlayerActionAnimations: registerPlayerActionAnimations
 	};
 }();
 
