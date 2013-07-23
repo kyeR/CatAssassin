@@ -10,18 +10,21 @@ $(function(){
 	Player.setStartingPosition();
 
 	var BULLET_SPEED = 10;
+	var leftAttacks = "." + Player.getWeapon().getAttackLeftName();
+	var rightAttacks = "." + Player.getWeapon().getAttackRightName();
 	
 	// Main game loop
 	$.playground().registerCallback(function(){
 		KeyBindings.handlePlayerMovement();
 
-		//Update the movement of the missiles
-		$(".playerBullets").each(function(){
+		//Update the movement of the attacks
+		$(rightAttacks).each(function(){
 				var posx = $(this).x();
 				if(posx > GameEnvironment.getWidth()){
 					$(this).remove();
 					return;
 				}
+
 				$(this).x(BULLET_SPEED, true);
 				// //Test for collisions
 				// var collided = $(this).collision(".enemy,."+$.gQ.groupCssClass);
@@ -49,6 +52,15 @@ $(function(){
 				// 	$(this).removeClass("playerMissiles");
 				// }
 			});
+		$(leftAttacks).each(function(){
+			var posx = $(this).x();
+			if(posx < 0){
+				$(this).remove();
+				return;
+			}
+			var speed = BULLET_SPEED * -1;
+			$(this).x(speed, true);
+		})
 	}, GameEnvironment.getRefreshRate());
 });
 
@@ -65,7 +77,7 @@ var KeyBindings = function(){
 	var leftPressed = false;
 	var rightPressed = false;
 	var shootPressed = false;
-	var rapidFire;
+	var rapidFireDelay = 0;
 
 	var keyPressed = function(){
 		return downPressed || upPressed || leftPressed || rightPressed;
@@ -125,10 +137,13 @@ var KeyBindings = function(){
 					break;
 				case SHOOT_KEY: //this is shoot (k)
 					if (shootPressed) {
-						rapidFire = setTimeout(Player.shootBullet(), 100);
+						rapidFireDelay++;
+						if (rapidFireDelay % 5 == 0) {
+							Player.fireWeapon();
+						}
 					}
 					else {
-						Player.shootBullet();
+						Player.fireWeapon();
 						shootPressed = true;
 					}
 					break;
@@ -149,7 +164,7 @@ var KeyBindings = function(){
 					downPressed = false;
 					break;
 				case SHOOT_KEY:
-					clearTimeout(rapidFire);
+					rapidFireDelay = 0;
 					shootPressed = false;
 					break;
 			}

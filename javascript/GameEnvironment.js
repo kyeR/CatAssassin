@@ -10,9 +10,9 @@ var GameEnvironment = function() {
 	var GAME_WIDTH	       = 700;
 	var GAME_HEIGHT	       = 500;
 	var REFRESH_RATE       = 30;
-	var FOREGROUND_IMAGE   = "images/grass.png";
-	var MIDDLEGROUND_IMAGE = "images/plants.png";
-	var BACKGROUND_IMAGE   = "images/stars.png";
+	var FOREGROUND_IMAGE   = "/images/grass.png";
+	var MIDDLEGROUND_IMAGE = "/images/plants.png";
+	var BACKGROUND_IMAGE   = "/images/stars.png";
 
 	// Player Settings
 	var PLAYER_HEIGHT      = 48;
@@ -41,6 +41,23 @@ var GameEnvironment = function() {
 		})
 	};
 
+	var weaponAnimations = {
+		fireRight: new $.gQ.Animation({
+			imageURL:"/images/player_missile_right.png",
+			numberOfFrame: 6,
+			delta: 10,
+			rate: 90,
+			type: $.gQ.ANIMATION_VERTICAL
+		}),
+		fireLeft: new $.gQ.Animation({
+			imageURL:"/images/player_missile_left.png",
+			numberOfFrame: 6,
+			delta: 10,
+			rate: 90,
+			type: $.gQ.ANIMATION_VERTICAL
+		})
+	};
+
 
 	// Methods
 	var getHeight = function() {
@@ -58,7 +75,7 @@ var GameEnvironment = function() {
 	var initGame = function() {
 		Playground.init(GAME_HEIGHT, GAME_WIDTH);
 		Playground.setupScenery(FOREGROUND_IMAGE, MIDDLEGROUND_IMAGE, BACKGROUND_IMAGE);
-		Player.init(PLAYER_HEIGHT, PLAYER_WIDTH, playerAnimations);
+		Player.init(PLAYER_HEIGHT, PLAYER_WIDTH, playerAnimations, weaponAnimations);
 		Playground.setupPlayer();
 		initializeStartButton();
 
@@ -88,6 +105,7 @@ var Playground = function(){
 	var playground;
 
 	var PLAYGROUND_ID = "#playground";
+	var WEAPON_LAYER = "playerWeaponLayer";
 
 	// Sprite names
 	var BACKGROUND_SPRITE_1   = "background1";
@@ -168,14 +186,16 @@ var Playground = function(){
 			playground = playground.end();
 		}
 
-		playground.addGroup("playerBulletLayer",
+		playground.addGroup(WEAPON_LAYER,
 			{
 				width: playgroundWidth,
 				height: playgroundHeight
 			}).end();
+	};
 
-	}
-
+	var getWeaponLayer = function(){
+		return WEAPON_LAYER;
+	};
 
 
 	var scrollScenery = function() {
@@ -231,7 +251,8 @@ var Playground = function(){
 		setupPlayer: setupPlayer,
 		scrollScenery: scrollScenery,
 		topOfMoveableArea: topOfMoveableArea,
-		scrollingPoint: scrollingPoint	
+		scrollingPoint: scrollingPoint,
+		getWeaponLayer: getWeaponLayer
 	};
 }();
 
@@ -247,15 +268,18 @@ var Player = function () {
 	var idleAnimation;
 	var walkRightAnimation;
 	var walkLeftAnimation;
-
+	var weapon;
 	var idle = false;
+	var facingLeft = false;
 
-	var init = function(height, width, animations) {
+	var init = function(height, width, playerAnimations, weaponAnimations) {
 		playerHeight = height;
 		playerWidth = width;	
-		idleAnimation = animations.idle;
-		walkRightAnimation = animations.walkRight;
-		walkLeftAnimation = animations.walkLeft;
+		idleAnimation = playerAnimations.idle;
+		walkRightAnimation = playerAnimations.walkRight;
+		walkLeftAnimation = playerAnimations.walkLeft;
+		PlayerWeapon.init(weaponAnimations);
+		weapon = PlayerWeapon;
 	};
 	
 	var getHeight = function() {
@@ -264,6 +288,10 @@ var Player = function () {
 	
 	var getWidth = function(){
 		return playerWidth;
+	};
+
+	var getWeapon = function(){
+		return weapon;
 	};
 	
 	var getIdleAnimation = function(){
@@ -287,6 +315,7 @@ var Player = function () {
 		$("#" + WALK_LEFT_SPRITE).setAnimation();
 		$("#" + IDLE_SPRITE).setAnimation(idleAnimation);
 		idle = true;
+		facingLeft = false;
 	}
 	
 	var animateWalkingRight = function() {
@@ -294,6 +323,7 @@ var Player = function () {
 		$("#" + WALK_LEFT_SPRITE).setAnimation();
 		$("#" + WALK_RIGHT_SPRITE).setAnimation(walkRightAnimation);
 		idle = false;
+		facingLeft = false;
 	}
 	
 	var animateWalkingLeft = function() {
@@ -301,6 +331,7 @@ var Player = function () {
 		$("#" + WALK_RIGHT_SPRITE).setAnimation();
 		$("#" + WALK_LEFT_SPRITE).setAnimation(walkLeftAnimation);
 		idle = false;
+		facingLeft = true;
 	}
 	
 	var moveUp = function() {
@@ -357,28 +388,12 @@ var Player = function () {
 		return $("#player").y();
 	};
 
-	var shootBullet = function(){
-		var bulletAnimation = new $.gQ.Animation(
-			{
-				imageURL:"images/bullet.png",
-				numberOfFrame: 1,
-				delta: 0,
-				rate: 0,
-				type: $.gQ.ANIMATION_VERTICAL
-			});
+	var isFacingLeft = function(){
+		return facingLeft;
+	};
 
-		var name = "playerBullet_"+Math.ceil(Math.random()*1000);
-
-		$("#playerBulletLayer").addSprite(name,
-			{
-				animation: bulletAnimation,
-				posx: xPosition() + 70,
-				posy: yPosition() + 18,
-				width: 20,
-				height: 20
-			});
-
-		$("#"+name).addClass("playerBullets");
+	var fireWeapon = function(){
+		weapon.fire();
 	};
 	
 	return {
@@ -386,6 +401,7 @@ var Player = function () {
 		init: init,
 		getHeight: getHeight,
 		getWidth: getWidth,
+		getWeapon: getWeapon,
 		getIdleAnimation: getIdleAnimation,
 		getIdleSprite: getIdleSprite,
 		getWalkRightSprite: getWalkRightSprite,
@@ -402,6 +418,82 @@ var Player = function () {
 		xPosition: xPosition,
 		yPosition: yPosition,
 		setStartingPosition: setStartingPosition,
-		shootBullet: shootBullet
+		fireWeapon: fireWeapon,
+		isFacingLeft: isFacingLeft
 	};
 }();
+
+var PlayerWeapon = function(){
+	var fireLeftAnimation;
+	var fireRightAnimation;
+	var attackRightName = "attackRight";
+	var attackLeftName = "attackLeft";
+	var weaponLayer;
+
+	var init = function(animations){
+		fireLeftAnimation = animations.fireLeft;
+		fireRightAnimation = animations.fireRight;
+		weaponLayer = "#" + Playground.getWeaponLayer();
+	};
+
+	var fire = function(){
+		var name = "playerAttack_"+Math.ceil(Math.random()*1000);
+		if (Player.isFacingLeft()){
+			fireLeft(name);
+		}
+		else {
+			fireRight(name);
+		}
+	};
+
+	var fireRight = function(attackName) {
+		$(weaponLayer).addSprite(attackName,
+			{
+				animation: fireRightAnimation,
+				posx: Player.xPosition() + 70,
+				posy: Player.yPosition() + 22,
+				width: 36,
+				height: 10
+			});
+
+		$("#" + attackName).addClass(attackRightName);
+	};
+
+	var fireLeft = function(attackName){
+		$(weaponLayer).addSprite(attackName,
+			{
+				animation: fireLeftAnimation,
+				posx: Player.xPosition() - 20,
+				posy: Player.yPosition() + 22,
+				width: 36,
+				height: 10
+			});
+		$("#" + attackName).addClass(attackLeftName);
+	};
+
+	var getAttackRightName = function(){
+		return attackRightName;
+	};
+
+	var getAttackLeftName = function(){
+		return attackLeftName;
+	};
+
+	return {
+		init: init,
+		fire: fire,
+		getAttackLeftName: getAttackLeftName,
+		getAttackRightName: getAttackRightName
+	};
+}();
+
+
+
+
+
+
+
+
+
+
+
