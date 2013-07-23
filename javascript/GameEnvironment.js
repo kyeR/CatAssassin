@@ -10,30 +10,30 @@ var GameEnvironment = function() {
 	var GAME_WIDTH	       = 700;
 	var GAME_HEIGHT	       = 500;
 	var REFRESH_RATE       = 30;
-	var FOREGROUND_IMAGE   = "/images/grass.png";
-	var MIDDLEGROUND_IMAGE = "/images/plants.png";
-	var BACKGROUND_IMAGE   = "/images/stars.png";
+	var FOREGROUND_IMAGE   = "images/grass.png";
+	var MIDDLEGROUND_IMAGE = "images/plants.png";
+	var BACKGROUND_IMAGE   = "images/stars.png";
 
 	// Player Settings
 	var PLAYER_HEIGHT      = 48;
 	var PLAYER_WIDTH       = 75;
 	var playerAnimations = {
 		idle: new $.gQ.Animation({
-			imageURL: "/images/CatGunIdle.png", 
+			imageURL: "images/CatGunIdle.png", 
 			numberOfFrame:8, 
 			delta:97, 
 			rate:100, 
 			type:$.gQ.ANIMATION_HORIZONTAL
 		}),
 		walkRight: new $.gQ.Animation({
-			imageURL: "/images/CatGunWalkRight.png", 
+			imageURL: "images/CatGunWalkRight.png", 
 			numberOfFrame:8, 
 			delta:96, 
 			rate:100, 
 			type:$.gQ.ANIMATION_HORIZONTAL
 		}),
 		walkLeft: new $.gQ.Animation({
-			imageURL: "/images/CatGunWalkLeft.png", 
+			imageURL: "images/CatGunWalkLeft.png", 
 			numberOfFrame:8, 
 			delta:96, 
 			rate:100, 
@@ -43,14 +43,14 @@ var GameEnvironment = function() {
 
 	var weaponAnimations = {
 		fireRight: new $.gQ.Animation({
-			imageURL:"/images/player_missile_right.png",
+			imageURL:"images/player_missile_right.png",
 			numberOfFrame: 6,
 			delta: 10,
 			rate: 90,
 			type: $.gQ.ANIMATION_VERTICAL
 		}),
 		fireLeft: new $.gQ.Animation({
-			imageURL:"/images/player_missile_left.png",
+			imageURL:"images/player_missile_left.png",
 			numberOfFrame: 6,
 			delta: 10,
 			rate: 90,
