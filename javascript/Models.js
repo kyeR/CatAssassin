@@ -194,11 +194,12 @@ var ControlsModel = function(){
 var PlayerModel = function () {
 
 	var PLAYER_HEIGHT      = 48;
-	var PLAYER_WIDTH       = 75;
+	var PLAYER_WIDTH       = 70;
 	var PLAYER_ID         = "#player";
 	var IDLE_SPRITE 	  = "playerIdle";
 	var WALK_RIGHT_SPRITE = "playerWalkRight";
 	var WALK_LEFT_SPRITE  = "playerWalkLeft";
+	var DIE_SPRITE        = "playerDie";
 
 	var PLAYER_ANIMATIONS = {
 		IDLE: new $.gQ.Animation({
@@ -221,6 +222,13 @@ var PlayerModel = function () {
 			delta:96, 
 			rate:100, 
 			type:$.gQ.ANIMATION_HORIZONTAL
+		}),
+		DIE: new $.gQ.Animation({
+			imageURL: spriteFolder + "/CatDie.png", 
+			numberOfFrame:7, 
+			delta:100, 
+			rate:100, 
+			type:$.gQ.ANIMATION_HORIZONTAL | $.gQ.ANIMATION_ONCE
 		})
 	};
 
@@ -251,6 +259,10 @@ var PlayerModel = function () {
 		return PLAYER_ANIMATIONS.WALK_LEFT;
 	};
 
+	var dieAnimation = function(){
+		return PLAYER_ANIMATIONS.DIE;
+	};
+
 	var idleSpriteName = function() {
 		return IDLE_SPRITE;
 	};
@@ -261,6 +273,10 @@ var PlayerModel = function () {
 	
 	var walkLeftSpriteName = function() {
 		return WALK_LEFT_SPRITE;
+	};
+
+	var dieSpriteName = function(){
+		return DIE_SPRITE;
 	};
 
 	var isFacingLeft = function(){
@@ -285,9 +301,11 @@ var PlayerModel = function () {
 		idleAnimation: idleAnimation,
 		walkRightAnimation: walkRightAnimation,
 		walkLeftAnimation: walkLeftAnimation,
+		dieAnimation: dieAnimation,
 		idleSpriteName: idleSpriteName,
 		walkRightSpriteName: walkRightSpriteName,
 		walkLeftSpriteName: walkLeftSpriteName,
+		dieSpriteName: dieSpriteName,
 		playerId: playerId,
 		isFacingLeft: isFacingLeft,
 		setFacingLeft: setFacingLeft,

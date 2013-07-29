@@ -97,10 +97,18 @@ var PlaygroundController = function(){
 			height: playerHeight
 		};
 
+		var dieSettings = {
+			posx:0,
+			posy:0,
+			width:75,
+			height: playerHeight
+		};
+
 		playground = playground.addGroup("player", groupSettings)
 			.addSprite(PlayerModel.idleSpriteName(), idleSettings)
 			.addSprite(PlayerModel.walkRightSpriteName(), walkRightSettings)
-			.addSprite(PlayerModel.walkLeftSpriteName(), walkLeftSettings).end().end();
+			.addSprite(PlayerModel.walkLeftSpriteName(), walkLeftSettings)
+			.addSprite(PlayerModel.dieSpriteName(), dieSettings).end().end();
 
 		playground.addGroup(weaponLayer,
 			{
@@ -123,6 +131,7 @@ var SceneryController = function(){
 	var backgroundSpeed;
 	var playgroundWidth;
 	var playgroundHeight;
+	var stopScroll = false;
 
 	var init = function(){
 		nodes = SceneryModel.backgroundSpriteIds();
@@ -134,7 +143,7 @@ var SceneryController = function(){
 	}
 
 	var updateScenery = function(){
-		if (PlayerController.isAdvancing()){
+		if (PlayerController.isAdvancing() && !stopScroll){
 			scrollScenery();
 		}
 	};
@@ -171,9 +180,14 @@ var SceneryController = function(){
         $(nodes.fg2).x(newPos);
 	};
 
+	var stopScrolling = function(){
+		stopScroll = true;
+	};
+
 	return {
 		updateScenery: updateScenery,
-		init: init
+		init: init,
+		stopScrolling: stopScrolling
 	};
 
 }();
@@ -182,18 +196,22 @@ var PlayerController = function(){
 	var walkRightSprite;
 	var walkLeftSprite;
 	var idleSprite;
+	var dieSprite;
 	var idleAnimation;
 	var walkRightAnimation;
 	var walkLeftAnimation;
+	var dieAnimation;
 	var playerId;
 
 	var init = function(){
 		walkRightSprite = PlayerModel.walkRightSpriteName();
 		walkLeftSprite = PlayerModel.walkLeftSpriteName();
 		idleSprite = PlayerModel.idleSpriteName();
+		dieSprite = PlayerModel.dieSpriteName();
 		walkRightAnimation = PlayerModel.walkRightAnimation();
 		walkLeftAnimation = PlayerModel.walkLeftAnimation();
 		idleAnimation = PlayerModel.idleAnimation();
+		dieAnimation = PlayerModel.dieAnimation();
 		playerId = PlayerModel.playerId();
 		setStartingPosition();
 	};
@@ -220,6 +238,16 @@ var PlayerController = function(){
 		$("#" + walkLeftSprite).setAnimation(walkLeftAnimation);
 		PlayerModel.setIdle(false);
 		PlayerModel.setFacingLeft(true);
+	};
+
+	var killPlayer = function(){
+		KeyBindingsController.stopInput();
+		Enemy1Controller.stopMovement();
+		SceneryController.stopScrolling();
+		$("#" + idleSprite).setAnimation();
+		$("#" + walkRightSprite).setAnimation();
+		$("#" + walkLeftSprite).setAnimation();
+		$("#" + dieSprite).setAnimation(dieAnimation);
 	};
 
 	var moveUp = function() {
@@ -281,6 +309,7 @@ var PlayerController = function(){
 		animateIdle: animateIdle,
 		animateWalkingRight: animateWalkingRight,
 		animateWalkingLeft: animateWalkingLeft,
+		killPlayer: killPlayer,
 		isAdvancing: isAdvancing,
 		moveUp: moveUp,
 		moveLeft: moveLeft,
@@ -406,6 +435,7 @@ var KeyBindingsController = function(){
 	var leftKey;
 	var rightKey;
 	var shootKey;
+	var noInput = false;
 
 	var getControlSettings = function(){
 		upKey = ControlsModel.upKey();
@@ -420,6 +450,10 @@ var KeyBindingsController = function(){
 		setAnimations();
 	}
 
+	var stopInput = function(){
+		noInput = true;
+	}
+
 	var downPressed = false;
 	var upPressed = false;
 	var leftPressed = false;
@@ -432,6 +466,10 @@ var KeyBindingsController = function(){
 	};
 
 	var updatePlayerMovement = function() {
+		if (noInput){
+			return;
+		}
+
 		if (!keyPressed() && !PlayerModel.isIdle()){
 			PlayerController.animateIdle();
 		}
@@ -454,6 +492,10 @@ var KeyBindingsController = function(){
 	var setAnimations = function() {
 		// Player movement animations
 		$(document).keydown(function(e){
+			if (noInput){
+				return;
+			}
+
 			switch(e.keyCode){
 				case leftKey: 
 					if (leftPressed)
@@ -517,7 +559,8 @@ var KeyBindingsController = function(){
 
 	return {
 		init: init,
-		updatePlayerMovement: updatePlayerMovement
+		updatePlayerMovement: updatePlayerMovement,
+		stopInput: stopInput
 	};
 }();
 
@@ -534,6 +577,7 @@ var Enemy1Controller = function(){
 	var explosionWidth;
 	var highestMoveablePoint;
 	var gameHeight;
+	var stop = false;
 
 	var init = function(){
 		enemyHeight = Enemy1Model.getHeight();
@@ -555,6 +599,10 @@ var Enemy1Controller = function(){
 	};
 
 	var updateEnemies = function(){
+		if (stop){
+			return;
+		}
+
 		$("."+enemyClass).each(function(){
 			move($(this));
 		});
@@ -585,6 +633,10 @@ var Enemy1Controller = function(){
 		return 420;
 	};
 
+	var stopMovement = function(){
+		stop = true;
+	}
+
 	var move = function(node){
 		var coinFlip = Math.random();
 
@@ -594,6 +646,8 @@ var Enemy1Controller = function(){
 		else{
 			moveUpOrDown(node);
 		}
+
+		checkForCollisions(node);
 	};
 
 	var moveLeft = function(node){
@@ -635,6 +689,30 @@ var Enemy1Controller = function(){
 		$(enemyNode).removeClass(enemyClass);
 	};
 
+	var checkForCollisions = function(enemy){
+		var collided = collisionWithPlayer(enemy);
+		if(collided.length > 0){
+			PlayerController.killPlayer();
+			//The player has been hit!
+			collided.each(function(){
+				})
+		}
+	};
+
+	var collisionWithPlayer = function(enemy){
+		var collided = $(enemy).collision("#playerIdle,."+$.gQ.groupCssClass);
+		if (collided.length > 0){
+			return collided;
+		}
+
+		collided = $(enemy).collision("#playerWalkRight,."+$.gQ.groupCssClass);
+		if (collided.length > 0){
+			return collided;
+		}
+
+		return $(enemy).collision("#playerWalkLeft,."+$.gQ.groupCssClass);
+	};
+
 	var coinFlip = function(){
 		var x = Math.random();
 		return x < 0.5;
@@ -644,6 +722,7 @@ var Enemy1Controller = function(){
 		init: init,
 		updateEnemies: updateEnemies,
 		startSpawningEnemies: startSpawningEnemies,
-		destroy: destroy
+		destroy: destroy,
+		stopMovement: stopMovement
 	};
 }();
