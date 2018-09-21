@@ -1,4 +1,4 @@
 CatAssassin
 ===========
 
-A ruthless killer...
+A cat that kills monsters. Open dev.html.
