@@ -160,7 +160,7 @@ var ControlsModel = function(){
 	var DOWN_KEY = 83;
 	var LEFT_KEY = 65;
 	var RIGHT_KEY = 68;
-	var SHOOT_KEY = 75;
+	var SHOOT_KEY = 32;
 
 	var upKey = function(){
 		return UP_KEY;
